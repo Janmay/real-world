@@ -1,8 +1,9 @@
 import * as constants from '../constants';
 import { Schemas } from '../middleware/api';
 import { Dispatch } from 'redux';
-import { StoreState } from '../reducers/index';
-import { CALL_API } from '../constants/index';
+import { StoreState } from '../reducers';
+import { CALL_API, STARGAZERS_REQUEST, STARGAZERS_SUCCESS } from '../constants';
+import { STARGAZERS_FAILURE } from '../constants/index';
 
 export interface ResetErrorMessage {
     type: constants.RESET_ERROR_MESSAGE;
@@ -25,8 +26,12 @@ const fetchUser = (login: string) => ({
 
 // Fetches a single user from Github API unless it is cached.
 // Relies on Redux Thunk middleware.
-export const loadUser = (login: string, requiredFields: string[] = []) => (dispatch: Dispatch<any>, getState: () => StoreState) => {
-    const user = getState().entities.users![login]
+export const loadUser = (login: string, requiredFields: string[] = []) => (
+    dispatch: Dispatch<any>,
+    getState: () => StoreState
+) => {
+    const entities = getState().entities
+    const user = entities && entities.users && entities.users[login]
     if (user && requiredFields.every(key => user.hasOwnProperty(key))) {
         return null
     }
@@ -44,7 +49,10 @@ const fetchRepo = (fullName: string) => ({
     }
 })
 
-export const loadRepo = (fullName: string, requiredFields: string[] = []) => (dispatch: Dispatch<any>, getState: () => StoreState) => {
+export const loadRepo = (fullName: string, requiredFields: string[] = []) => (
+    dispatch: Dispatch<any>,
+    getState: () => StoreState
+) => {
     const repo = getState().entities.repos![fullName]
     if (repo && requiredFields.every(key => repo.hasOwnProperty(key))) {
         return null
@@ -62,7 +70,10 @@ const fetchStarred = (login: string, nextPageUrl: string) => ({
     }
 })
 
-export const loadStarred = (login: string, nextPage: boolean = false) => (dispatch: Dispatch<any>, getState: () => StoreState) => {
+export const loadStarred = (login: string, nextPage: boolean = false) => (
+    dispatch: Dispatch<any>,
+    getState: () => StoreState
+) => {
     const {
         nextPageUrl = `users/${login}/starred`,
         pageCount = 0
@@ -73,4 +84,34 @@ export const loadStarred = (login: string, nextPage: boolean = false) => (dispat
     }
 
     return dispatch(fetchStarred(login, nextPageUrl))
+}
+
+// Fetches a page of stargazers for a particular repo.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchStargazers = (fullName: string, nextPageUrl: string) => ({
+    fullName,
+    [CALL_API]: {
+        endpoint: nextPageUrl,
+        schema: Schemas.REPO_ARRAY,
+        types: [ STARGAZERS_REQUEST, STARGAZERS_SUCCESS, STARGAZERS_FAILURE ]
+    }
+})
+
+// Fetches a page of stargazers for a particular repo.
+// Bails out if page is cached and user didn't specifically request next page.
+// Relies on Redux Thunk middleware.
+export const loadStargazers = (fullName: string, nextPage?: boolean) => (
+    dispatch: Dispatch<any>,
+    getState: () => StoreState
+) => {
+    const {
+        nextPageUrl = `repos/${fullName}/stargazers`,
+        pageCount = 0
+    } = getState().pagination.stargazersByRepo[fullName] || {}
+
+    if (pageCount > 0 && !nextPage) {
+        return null
+    }
+
+    return dispatch(fetchStargazers(fullName, nextPageUrl))
 }

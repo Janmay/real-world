@@ -13,5 +13,9 @@ export const REPO_REQUEST = 'REPO_REQUEST'
 export const REPO_SUCCESS = 'REPO_SUCCESS'
 export const REPO_FAILURE = 'REPO_FAILURE'
 
+export const STARGAZERS_REQUEST = 'STARGAZERS_REQUEST'
+export const STARGAZERS_SUCCESS = 'STARGAZERS_SUCCESS'
+export const STARGAZERS_FAILURE = 'STARGAZERS_FAILURE'
+
 // Action key that carries API call info interpreted by this Redux middleware.
 export const CALL_API = 'Call API'

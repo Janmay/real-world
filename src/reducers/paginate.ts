@@ -41,9 +41,11 @@ const paginate = ({ types, mapActionToKey }: Paginate) => {
             case successType:
                 return {
                     ...state,
-                    ids: union(state.ids, action.response.result),
+                    ids: action.response
+                        ? union(state.ids, action.response.result)
+                        : state.ids,
                     isFetching: false,
-                    nextPageUrl: action.response.nextPageUrl,
+                    nextPageUrl: action.response && action.response.nextPageUrl,
                     pageCount: state.pageCount + 1
                 }
             case failureType:

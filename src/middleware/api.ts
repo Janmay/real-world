@@ -27,7 +27,7 @@ const callApi = (endpoint: string, resSchema: Schema) => {
     const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
 
     return fetch(fullUrl)
-        .then(response => {
+        .then(response => 
             response.json().then<object>((json) => {
                 if (!response.ok) {
                     return Promise.reject(json)
@@ -41,7 +41,7 @@ const callApi = (endpoint: string, resSchema: Schema) => {
                     { nextPageUrl }
                 )
             })
-        })
+        )
 }
 
 // We use this Normalizr schemas to transform API responses from a nested form
@@ -83,7 +83,7 @@ export default (store: MiddlewareAPI<Dispatch, StoreState>) => (next: Dispatch) 
     }
 
     let { endpoint } = callAPI
-    const { apiSchema, types } = callAPI
+    const { schema: apiSchema, types } = callAPI
 
     if (typeof endpoint === 'function') {
         endpoint = endpoint(store.getState())

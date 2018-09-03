@@ -3,7 +3,7 @@ import * as React from 'react';
 export interface ListProps {
     loadingLabel: string;
     pageCount?: number;
-    renderItem: (data: object[]) => React.ReactNode;
+    renderItem: (data: object | object[]) => React.ReactNode;
     items: object[];
     isFetching: boolean;
     onLoadMoreClick: () => void;

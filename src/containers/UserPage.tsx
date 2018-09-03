@@ -77,15 +77,14 @@ class UserPage extends React.Component<UserPageProps> {
 const mapStateToProps = (state: StoreState, ownProps: UserPageRouteProps) => {
     const login: string = ownProps.match.params.login.toLowerCase()
 
-    const {
-        pagination: { starredByUser },
-        entities: { users, repos }
-    } = state
+    const starredByUser = state.pagination.starredByUser
+    const repos = state.entities && state.entities.repos
+    const users = state.entities && state.entities.users
 
-    const user: UserPageProps['user'] = users![login]
+    const user: UserPageProps['user'] = users && users[login]
     const starredPagination: UserPageProps['starredPagination'] = starredByUser[login] || { ids: [] }
-    const starredRepos: UserPageProps['starredRepos'] = starredPagination!.ids.map((id:string) => repos![id])
-    const starredRepoOwners: UserPageProps['starredRepoOwners'] = starredRepos.map((repo: {owner: string}) => users![repo.owner])
+    const starredRepos: UserPageProps['starredRepos'] = starredPagination && starredPagination.ids.map((id:string) => repos && repos[id]) || []
+    const starredRepoOwners: UserPageProps['starredRepoOwners'] = starredRepos.map((repo: {owner: string}) => users && users[repo.owner])
 
     return {
         login,
