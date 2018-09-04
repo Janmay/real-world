@@ -12,6 +12,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const tsImportPluginFactory = require('ts-import-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -22,6 +23,8 @@ const publicPath = '/';
 const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
+// `style: true` 会加载 less 文件
+const importPluginOption = { "libraryName": "antd", "libraryDirectory": "es", "style": "css" };
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -145,8 +148,10 @@ module.exports = {
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
               compact: true,
+              plugins: [
+                ["import", importPluginOption]
+              ]
             },
           },
 
@@ -160,6 +165,9 @@ module.exports = {
                 options: {
                   // disable type checker - we will use it in fork plugin
                   transpileOnly: true,
+                  getCustomTransformers: () => ({
+                    before: [tsImportPluginFactory(importPluginOption)]
+                  })
                 },
               },
             ],

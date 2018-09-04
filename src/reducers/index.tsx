@@ -2,7 +2,14 @@ import * as ActionTypes from '../actions';
 import * as constants from '../constants';
 import { combineReducers } from 'redux';
 import paginate from './paginate';
-import { STARRED_REQUEST, STARRED_SUCCESS, STARRED_FAILURE } from '../constants';
+import {
+    STARRED_REQUEST,
+    STARRED_SUCCESS,
+    STARRED_FAILURE,
+    STARGAZERS_REQUEST,
+    STARGAZERS_SUCCESS,
+    STARGAZERS_FAILURE
+} from '../constants';
 import { merge } from 'lodash'
 
 export interface EntitiesState {
@@ -43,6 +50,14 @@ const errorMessage = (state = null, { type, error }: ActionTypes.ResetErrorMessa
 
 // Updates the pagination data for different actions.
 const pagination = combineReducers({
+    stargazersByRepo: paginate({
+        mapActionToKey: (action: {fullName: string}) => action.fullName,
+        types: [
+          STARGAZERS_REQUEST,
+          STARGAZERS_SUCCESS,
+          STARGAZERS_FAILURE
+        ]
+    }),
     starredByUser: paginate({
         mapActionToKey: (action: {login: string}) => action.login,
         types: [

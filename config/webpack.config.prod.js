@@ -14,6 +14,7 @@ const paths = require('./paths');
 const getClientEnvironment = require('./env');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const tsImportPluginFactory = require('ts-import-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -29,6 +30,8 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 const publicUrl = publicPath.slice(0, -1);
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
+// `style: true` 会加载 less 文件
+const importPluginOption = { "libraryName": "antd", "libraryDirectory": "es", "style": "css" };
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
@@ -150,8 +153,10 @@ module.exports = {
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
               compact: true,
+              plugins: [
+                ["import", importPluginOption]
+              ]
             },
           },
           // Compile .tsx?
@@ -165,6 +170,9 @@ module.exports = {
                   // disable type checker - we will use it in fork plugin
                   transpileOnly: true,
                   configFile: paths.appTsProdConfig,
+                  getCustomTransformers: () => ({
+                    before: [tsImportPluginFactory(importPluginOption)]
+                  })
                 },
               },
             ],

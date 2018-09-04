@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Button, Input, Row, Col } from 'antd';
 
 const GITHUB_REPO = 'https://github.com/reduxjs/redux'
 
@@ -9,44 +10,23 @@ export interface ExploreProps {
 
 class Explore extends React.Component<ExploreProps> {
 
-    input: HTMLInputElement | null = null;
-
-    componentWillReceiveProps(nextProps: ExploreProps) {
-        if (nextProps.value !== this.props.value) {
-            this.setInputValue(nextProps.value)
-        }
-    }
-
-    getInputValue = () => {
-        return this.input!.value
-    }
-
-    setInputValue = (val: string) => {
-        this.input!.value = val;
-    }
-
-    handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.keyCode === 13) {
-            this.handleGoClick()
-        }
-    }
-
-    handleGoClick = () => {
-        this.props.onChange(this.getInputValue())
+    handleGoClick = (value: string) => {
+        this.props.onChange(value)
     }
 
     render() {
         return (
             <div>
                 <p>Type a username or repo full name and hit 'Go':</p>
-                <input
-                    type="text"
-                    size={45}
-                    ref={(input) => this.input = input}
-                    defaultValue={this.props.value}
-                    onKeyUp={this.handleKeyUp}
-                />
-                <button onClick={this.handleGoClick}>Go!</button>
+                <Row>
+                    <Col span={12}>
+                        <Input.Search
+                            defaultValue={this.props.value}
+                            onSearch={this.handleGoClick}
+                            enterButton={<Button type='primary'>Go!</Button>}
+                        />
+                    </Col>
+                </Row>
                 <p>
                     Code on <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">Github</a>.
                 </p>
