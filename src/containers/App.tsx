@@ -52,8 +52,8 @@ const mapStateToProps = ({ errorMessage }: StoreState, ownProps: AppProps) => ({
     inputValue: ownProps.location.pathname.substring(1)
 })
 
-const mapDispatchToProps = () => ({
+const mapDispatchToProps = {
     resetErrorMessage
-})
+};
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
